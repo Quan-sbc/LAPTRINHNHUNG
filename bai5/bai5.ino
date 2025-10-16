@@ -2,8 +2,8 @@
 LiquidCrystal lcd(7,6,5,4,3,2);
 int btn = 1;
 int led = 0;
-int number_of_times = 0;
-unsigned long pre_status_btn = LOW;
+int solannhan = 0;
+unsigned long pre_btn = LOW;
 void setup() {
   lcd.begin(16,2);
   pinMode(led,OUTPUT);
@@ -11,13 +11,13 @@ void setup() {
 }
 
 void loop() {
-  unsigned long cur_status_btn = digitalRead(btn);
-  number_of_times = number_of_times % 2;
-  if(cur_status_btn == LOW && pre_status_btn == HIGH)
+  unsigned long cur_btn = digitalRead(btn);
+  solannhan = solannhan % 2;
+  if(cur_btn == LOW && pre_btn == HIGH)
   {
-    number_of_times++;
+    solannhan++;
   }
-  if(number_of_times == 0)
+  if(solannhan == 0)
   {
     digitalWrite(led,LOW);
     lcd.clear();
@@ -30,5 +30,5 @@ void loop() {
     lcd.noDisplay();
     digitalWrite(led,HIGH);
   }
-  pre_status_btn = cur_status_btn;
+  pre_btn = cur_btn;
 }
