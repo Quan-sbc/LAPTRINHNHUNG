@@ -1,134 +1,196 @@
-#include <LiquidCrystal.h>
+#include<LiquidCrystal.h>
 LiquidCrystal lcd(12,11,5,4,3,2);
-
-// ===== Các ký tự đặc biệt =====
-byte E_E[8] = {
-  B00100,
-  B01110,
-  B10001,
-  B11111,
-  B10000,
-  B11111,
-  B10001,
-  B10001
+unsigned long pre_time = 0;
+int x = 0;
+int y = 0;
+int btn_e = 7;
+int btn_o = 8;
+int btn_f = 9;
+int btn_s = 10;
+int pre_btn_e = LOW;
+int pre_btn_o = LOW;
+int pre_btn_s = LOW;
+int pre_btn_f = LOW;
+char pre_char = '\0';
+byte EE[8] ={
+B00100,
+B01010,
+B11111,
+B10000,
+B11111,
+B10000,
+B11111,
+B00000
 };
-
-byte O_O[8] = {
-  B00100,
-  B01110,
-  B10001,
-  B10001,
-  B10001,
-  B10001,
-  B01110,
-  B00000
+byte ES[8] ={
+B00010,
+B00100,
+B11111,
+B10000,
+B11111,
+B10000,
+B11111,
+B00000
 };
-
-byte E_F[8] = {
-  B01000,
-  B00100,
-  B11111,
-  B10000,
-  B11111,
-  B10001,
-  B11111,
-  B10001
+byte EF[8] ={
+B01000,
+B00100,
+B11111,
+B10000,
+B11111,
+B10000,
+B11111,
+B00000
 };
-
-byte E_S[8] = {
-  B00100,
-  B01000,
-  B11111,
-  B10000,
-  B11111,
-  B10001,
-  B11111,
-  B10001
+byte OO[8] ={
+B00100,
+B10001,
+B01110,
+B10001,
+B10001,
+B10001,
+B01110,
+B00000
 };
-
-byte O_F[8] = {
-  B01000,
-  B00100,
-  B01110,
-  B10001,
-  B10001,
-  B10001,
-  B01110,
-  B00000
+byte OF[8] ={
+B01000,
+B00100,
+B01110,
+B10001,
+B10001,
+B10001,
+B01110,
+B00000
 };
-
-byte O_S[8] = {
-  B00100,
-  B01000,
-  B01110,
-  B10001,
-  B10001,
-  B10001,
-  B01110,
-  B00000
+byte OS[8] ={
+B00010,
+B00100,
+B01110,
+B10001,
+B10001,
+B10001,
+B01110,
+B00000
 };
-
-// ===== Khai báo chân nút =====
-int btn_E = 7;
-int btn_O = 8;
-int btn_F = 9;
-int btn_S = 10;
-
-char lastKey = '\0'; // ký tự trước đó
-
-// ===== SETUP =====
 void setup() {
   lcd.begin(16,2);
-  lcd.createChar(0,E_E);
-  lcd.createChar(1,O_O);
-  lcd.createChar(2,E_F);
-  lcd.createChar(3,E_S);
-  lcd.createChar(4,O_F);
-  lcd.createChar(5,O_S);
-
-  pinMode(btn_E, INPUT_PULLUP);
-  pinMode(btn_O, INPUT_PULLUP);
-  pinMode(btn_F, INPUT_PULLUP);
-  pinMode(btn_S, INPUT_PULLUP);
-
-  lcd.print("Ban phim EOFS");
-  delay(1500);
-  lcd.clear();
+  lcd.createChar(0,EE);
+  lcd.createChar(1,ES);
+  lcd.createChar(2,EF);
+  lcd.createChar(3,OO);
+  lcd.createChar(4,OF);
+  lcd.createChar(5,OS);
+  pinMode(btn_e,INPUT);
+  pinMode(btn_o,INPUT);
+  pinMode(btn_f,INPUT);
+  pinMode(btn_s,INPUT);
 }
 
-// ===== LOOP =====
 void loop() {
-    lcd.setCursor(0,0);
-  char key = readKey();  // đọc nút nhấn
-  if (key != '\0') {     // nếu có phím được bấm
-    if (lastKey != '\0') {
-      processCombo(lastKey, key);
-      lastKey = '\0';
-    } else {
-      lastKey = key;
+  
+  int cur_btn_e = digitalRead(btn_e);
+  int cur_btn_o = digitalRead(btn_o);
+  int cur_btn_s = digitalRead(btn_s);
+  int cur_btn_f = digitalRead(btn_f);
+  if(cur_btn_e == LOW && pre_btn_e == HIGH)
+  {
+    if(pre_char == 'e')
+    {
+      x--;
+      lcd.setCursor(x,y);
+      lcd.print("");
+      lcd.write(byte(0));
+      pre_char = '\0';
     }
+    else
+    {
+      lcd.setCursor(x,y);
+      lcd.print("E");
+      pre_char = 'e';
+    }
+    x++;
   }
-}
 
-// ===== Hàm đọc phím =====
-char readKey() {
-  if (digitalRead(btn_E) == LOW) { delay(200); return 'E'; }
-  if (digitalRead(btn_O) == LOW) { delay(200); return 'O'; }
-  if (digitalRead(btn_F) == LOW) { delay(200); return 'F'; }
-  if (digitalRead(btn_S) == LOW) { delay(200); return 'S'; }
-  return '\0';
-}
-
-// ===== Xử lý tổ hợp =====
-void processCombo(char first, char second) {
-  if (first=='E' && second=='E') lcd.write(byte(0));   // Ê
-  else if (first=='O' && second=='O') lcd.write(byte(1)); // Ô
-  else if (first=='E' && second=='F') lcd.write(byte(2)); // È
-  else if (first=='E' && second=='S') lcd.write(byte(3)); // É
-  else if (first=='O' && second=='F') lcd.write(byte(4)); // Ò
-  else if (first=='O' && second=='S') lcd.write(byte(5)); // Ó
-  else {
-    lcd.print(first);
-    lcd.print(second);
+  if(cur_btn_o == LOW && pre_btn_o == HIGH)
+  {
+    if(pre_char == 'o')
+    {
+      x--;
+      lcd.setCursor(x,y);
+      lcd.print("");
+      lcd.write(byte(3));
+      pre_char = '\0';
+    }
+    else
+    {
+      lcd.setCursor(x,y);
+      lcd.print("O");
+      pre_char = 'o';
+    }
+    x++;
   }
+
+  if(cur_btn_s == LOW && pre_btn_s == HIGH)
+  {
+    if(pre_char == 'o')
+    {
+      x--;
+      lcd.setCursor(x,y);
+      lcd.print("");
+      lcd.write(byte(5));
+    }
+    else if(pre_char == 'e')
+    {
+      x--;
+      lcd.setCursor(x,y);
+      lcd.print("");
+      lcd.write(byte(1));
+    }
+    else
+    {
+      lcd.setCursor(x,y);
+      lcd.print("S");
+    }
+    pre_char = '\0';
+    x++;
+  }
+
+   if(cur_btn_f == LOW && pre_btn_f == HIGH)
+  {
+    if(pre_char == 'o')
+    {
+      x--;
+      lcd.setCursor(x,y);
+      lcd.print("");
+      lcd.write(byte(4));
+    }
+    else if(pre_char == 'e')
+    {
+      x--;
+      lcd.setCursor(x,y);
+      lcd.print("");
+      lcd.write(byte(2));
+    }
+    else
+    {
+      lcd.setCursor(x,y);
+      lcd.print("F");
+    }
+    pre_char = '\0';
+    x++;
+  }
+
+  if(x > 15){
+    x = 0;
+    y++;
+  }
+  if(y > 1){
+    x = 0;
+    y = 0;
+    lcd.clear();
+  }
+  pre_btn_e = cur_btn_e;
+  pre_btn_o = cur_btn_o;
+  pre_btn_s = cur_btn_s;
+  pre_btn_f = cur_btn_f;
 }
